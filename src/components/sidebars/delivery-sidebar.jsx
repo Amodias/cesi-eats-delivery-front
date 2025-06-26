@@ -28,9 +28,9 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { adminNav } from "@/constants";
+import { deliveryNav } from "@/constants";
 
-export default function DashboardSidebar({ navItems = adminNav }) {
+export default function DeliverySidebar({ navItems = deliveryNav }) {
   const pathname = usePathname();
   const { state } = useSidebar();
   return (
