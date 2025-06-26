@@ -4,7 +4,6 @@ import { clientNav } from "@/constants";
 import { ThemeProvider } from "next-themes";
 import { cookies, headers } from "next/headers";
 import DeliverySidebar from "@/components/sidebars/delivery-sidebar";
-
 export const metadata = {
   title: "CESI EATS",
   robots: { index: false },
