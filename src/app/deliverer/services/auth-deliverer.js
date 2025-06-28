@@ -4,7 +4,7 @@ const USER_BASE_URL = "http://localhost:4001";
 
 class AuthService {
   async verifyDeliverer() {
-    const response = await fetch(`${USER_BASE_URL}/deliverers/current`, {
+    return await fetch(`${USER_BASE_URL}/deliverers/current`, {
       headers: {
         authorization: `Bearer ${getCookie("token")}`,
       },
@@ -12,5 +12,6 @@ class AuthService {
   }
 }
 
+// Create and export a singleton instance
 const authService = new AuthService();
 export default authService;
