@@ -25,43 +25,64 @@ import { deliveryRegisterSchema } from "@/schemas/auth-schemas";
 import { EyeOff } from "lucide-react";
 import { Eye } from "lucide-react";
 
+// vehiculeID
+// nationalID
+// password
+// phoneNumber
+// address
+// lastName
+// firstName
+
 export default function DeliveryRegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const form = useForm({
-    resolver: zodResolver(deliveryRegisterSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      nationalID: "",
-      vehiculeID: "",
-      address: "",
-      phoneNumber: "",
-      password: "",
-    },
     mode: "onChange",
     reValidateMode: "onChange",
     shouldUnregister: true,
   });
 
-  const onSubmit = async (values) => {
-    const dirtyFields = form.formState.dirtyFields;
+  const onSubmit = async () => {
+    const values = form.getValues();
 
-    const response = await fetch("/auth/register/delivery", {
+    await fetch("http://localhost:4001/deliverers", {
       method: "POST",
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(values),
     });
+    // if (!response.ok)
+    //   return toast.error("Une erreur s'est produite lors de la requete.");
+    // const responseData = await response.json();
 
-    if (!response.ok)
-      return toast.error("Une erreur s'est produite lors de la requete.");
-    const responseData = await response.json();
+    // if (!responseData.success)
+    //   return toast.error("Une erreur s'est produite lors de l'ajout.");
 
-    if (!responseData.success)
-      return toast.error("Une erreur s'est produite lors de l'ajout.");
+    const response2 = await fetch("http://localhost:4000/auth/login", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(values),
+    });
+    if (!response2.ok)
+      return toast.error("Un problème est survenu lors de l'authentification.");
 
+    if (response2.status === 401)
+      return toast.error("Identifiants incorrects. Veuillez réessayer.");
+
+    const data = await response2.json();
+    console.log(data);
+
+    toast.success(`Authentification réussie. Bienvenue ${data.firstName}`);
+
+    document.cookie = `token=${data.accessToken}; path=/; max-age=86400; secure; samesite=strict`;
     toast.success("Ajouté avec succès.");
-    router.refresh();
+    router.replace(data.redirectUrl);
     form.reset();
   };
   const togglePasswordVisibility = () => {
@@ -119,6 +140,7 @@ export default function DeliveryRegisterForm() {
                 <FormLabel>Matricule vehicule *</FormLabel>
                 <FormControl>
                   <Input
+                    type="number"
                     placeholder="Le matricule de votre vehicule"
                     defaultValue={field.value}
                     onChange={field.onChange}
@@ -136,6 +158,7 @@ export default function DeliveryRegisterForm() {
                 <FormLabel>N˚ de carte nationale *</FormLabel>
                 <FormControl>
                   <Input
+                    type="number"
                     placeholder="le numéro de carte nationale"
                     defaultValue={field.value}
                     onChange={field.onChange}
@@ -146,6 +169,19 @@ export default function DeliveryRegisterForm() {
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name="birthDate"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Date de naissance *</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="address"
@@ -207,6 +243,23 @@ export default function DeliveryRegisterForm() {
                     )}
                   </Button>
                 </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="referralCode"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Code de parrainage</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Code de parrainage (optionnel)"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -41,8 +41,6 @@ export default function DelivererForm({ children, data, open, setOpen }) {
       profilePicture: data.profilePicture ?? " ",
       referralCode: data.referralCode ?? " ",
       referredPoints: data.referredPoints ?? " ",
-      createdAt: data.createdAt ?? " ",
-      updatedAt: data.updatedAt ?? " ",
     },
   });
 

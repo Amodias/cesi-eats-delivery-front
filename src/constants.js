@@ -91,12 +91,12 @@ export const deliveryNav = [
         url: "/deliverer/notifications",
         permissions: ["deliverer"],
       },
-      {
-        icon: Users,
-        title: "Parrainage d'un livreur",
-        url: "/deliverer/referral",
-        permissions: ["deliverer"],
-      },
+      // {
+      //   icon: Users,
+      //   title: "Parrainage d'un livreur",
+      //   url: "/deliverer/referral",
+      //   permissions: ["deliverer"],
+      // },
     ],
   },
 ];
@@ -140,7 +140,7 @@ export const registerTypes = [
     name: "Livreur",
     description: "Livrer des commandes et gagner de l'argent.",
     icon: "🛵",
-    path: "/auth/register/client",
+    path: "/auth/register/delivery",
   },
   {
     id: "restaurant",

@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/sidebar";
 import { deliveryNav } from "@/constants";
 import NotificationCard from "./notification-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Sheet,
   SheetClose,
@@ -47,43 +47,40 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { getNotifications } from "@/services/notifications";
 
 const mockNotifications = [
   {
     id: 1,
-    title: "Nouvelle commande",
     message:
       "Une nouvelle commande #1234 a été assignée à votre zone de livraison.",
-    timestamp: "Il y a 5 minutes",
+    type: "order_assigned",
+    createdAt: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
     read: false,
-    type: "order",
   },
   {
     id: 2,
-    title: "Livraison terminée",
     message:
       "La commande #1230 a été livrée avec succès à l'adresse 123 Rue de la Paix.",
-    timestamp: "Il y a 15 minutes",
+    type: "order_delivered",
+    createdAt: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
     read: true,
-    type: "delivery",
   },
   {
     id: 3,
-    title: "Alerte stock",
     message:
       "Le stock de produits frais est faible dans votre zone. Veuillez vous réapprovisionner.",
-    timestamp: "Il y a 30 minutes",
+    type: "order_status_updated",
+    createdAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
     read: false,
-    type: "alert",
   },
   {
     id: 4,
-    title: "Mise à jour itinéraire",
     message:
       "Votre itinéraire de livraison a été optimisé pour les prochaines commandes.",
-    timestamp: "Il y a 1 heure",
+    type: "order_ready",
+    createdAt: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
     read: true,
-    type: "update",
   },
 ];
 
@@ -92,6 +89,13 @@ export default function DeliverySidebar({ navItems = deliveryNav }) {
   const { state } = useSidebar();
   const [isNotificationSheetOpen, setIsNotificationSheetOpen] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getNotifications();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleNotificationClick = (notification) => {
     // Mark notification as read when clicked

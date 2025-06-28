@@ -16,7 +16,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 import OrderActions from "./order-action";
+import { getCookie } from "@/lib/cookies";
 
+// 4
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,13 +28,19 @@ const OrdersList = () => {
   // Mock API functions - replace with actual API calls
   const fetchAvailableOrders = async () => {
     try {
-      // Replace with actual API call
-      // const response = await fetch('/api/orders/deliverer/available', {
-      //   headers: {
-      //     'Authorization': `Bearer ${localStorage.getItem('token')}`
-      //   }
-      // });
-      // const data = await response.json();
+      const response = await fetch(
+        "http://localhost:4004/orders/deliverer/available",
+        {
+          headers: {
+            Accept: "application/json",
+            authorization: `Bearer ${getCookie("token")}`,
+          },
+          credentials: "include", // pour envoyer le refreshToken en cookie
+        },
+      );
+      const data = await response.json();
+
+      console.log(data);
 
       // Mock data for demonstration
       const mockOrders = [
@@ -70,7 +78,7 @@ const OrdersList = () => {
         },
       ];
 
-      return mockOrders;
+      return data.data || mockOrders;
     } catch (error) {
       throw new Error("Erreur lors du chargement des commandes");
     }
@@ -79,13 +87,17 @@ const OrdersList = () => {
   const acceptOrder = async (orderId) => {
     try {
       // Replace with actual API call
-      // const response = await fetch(`/api/orders/${orderId}/accept`, {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      //     'Content-Type': 'application/json'
-      //   }
-      // });
+      const response = await fetch(
+        `http://localhost:4004/orders/${orderId}/accept`,
+        {
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            authorization: `Bearer ${getCookie("token")}`,
+          },
+          credentials: "include", // pour envoyer le refreshToken en cookie
+        },
+      );
 
       // Mock success
       setOrders((prevOrders) =>
@@ -109,13 +121,17 @@ const OrdersList = () => {
   const markDelivered = async (orderId) => {
     try {
       // Replace with actual API call
-      // const response = await fetch(`/api/orders/${orderId}/deliver`, {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      //     'Content-Type': 'application/json'
-      //   }
-      // });
+      const response = await fetch(
+        `http://localhost:4004/orders/${orderId}/deliver`,
+        {
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            authorization: `Bearer ${getCookie("token")}`,
+          },
+          credentials: "include", // pour envoyer le refreshToken en cookie
+        },
+      );
 
       // Mock success
       setOrders((prevOrders) =>
