@@ -17,26 +17,13 @@ import {
   Check,
 } from "lucide-react";
 import { DelivererForm } from ".";
+import { useDeliverer } from "../../context/deliverer-provider";
 
 export default function DelivererCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [copiedField, setCopiedField] = useState("");
   const [open, setOpen] = useState(false);
-  // Sample deliverer data
-  const deliverer = {
-    firstName: "Ahmed",
-    lastName: "Benali",
-    address: "15 Rue des Martyrs, Oran 31000",
-    phoneNumber: "+213 555 123 456",
-    birthDate: "1990-03-15",
-    password: "SecurePass123!",
-    nationalID: "1234567890123",
-    vehiculeID: "OR-123-AB",
-    profilePicture:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    referralCode: "DELIVER2024",
-    referredPoints: 1250,
-  };
+  const deliverer = useDeliverer();
 
   const copyToClipboard = (text, field) => {
     navigator.clipboard.writeText(text);
@@ -312,12 +299,6 @@ export default function DelivererCard() {
               data={deliverer}
               children={<></>}
             />
-            <Button className="flex-1" variant="outline">
-              Historique des livraisons
-            </Button>
-            <Button variant="outline" size="sm">
-              Désactiver
-            </Button>
           </div>
         </CardContent>
       </Card>

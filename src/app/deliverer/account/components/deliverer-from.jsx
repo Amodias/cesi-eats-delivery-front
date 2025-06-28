@@ -22,64 +22,59 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { clientsFormSchema } from "@/schemas/client-schema";
 import { toast } from "sonner";
+import { getCookie } from "@/lib/cookies";
+import { apiFetch } from "@/lib/api-wrapper";
 
 export default function DelivererForm({ children, data, open, setOpen }) {
-  const [isUpdate, setIsUpdate] = useState(data !== undefined);
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm({
-    resolver: zodResolver(clientsFormSchema),
     defaultValues: {
-      firstName: data?.firstName ?? "",
-      lastName: data?.lastName ?? "",
-      email: data?.email ?? "",
-      phone: data?.phone ?? "",
-      password: "",
-      type: "user",
+      firstName: data.firstName ?? " ",
+      lastName: data.lastName ?? " ",
+      address: data.address ?? " ",
+      phoneNumber: data.phoneNumber ?? " ",
+      birthDate: data.birthDate ?? " ",
+      nationalID: data.nationalID ?? " ",
+      vehiculeID: data.vehiculeID ?? " ",
+      profilePicture: data.profilePicture ?? " ",
+      referralCode: data.referralCode ?? " ",
+      referredPoints: data.referredPoints ?? " ",
+      createdAt: data.createdAt ?? " ",
+      updatedAt: data.updatedAt ?? " ",
     },
-    shouldUnregister: true,
   });
 
-  const handleCreation = async (values) => {
-    const response = await fetch("http://localhost:4000/users/deliverers", {
-      method: "POST",
-      headers: { Accept: "application/json" },
-      body: JSON.stringify(values),
-    });
-    const responseData = await response.json();
-    if (response.ok) {
-      setOpen(false);
-      if (responseData.success) toast.success("Ajouté avec succès.");
-      else toast.error("Une erreur s'est produite");
-      window.location.reload();
-    }
-  };
+  const onSubmit = async () => {
+    try {
+      setIsLoading(true);
+      const values = form.getValues();
+      const token = getCookie("token");
 
-  const handleUpdate = async (values) => {
-    const response = await fetch(
-      `http://localhost:4000/users/deliverers/${data._id}`,
-      {
+      const response = await fetch(`http://localhost:4001/deliverers/current`, {
         method: "PUT",
         headers: {
           Accept: "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(values),
-      },
-    );
+      });
 
-    let responseData = await response.json();
-    if (response.ok) {
-      if (responseData.success) toast.success("Modifié avec succès");
-      else toast.error("Une erreur s'est produite");
+      let responseData = await response.json();
+      if (response.ok) {
+        if (responseData.success) toast.success("Modifié avec succès");
+        else toast.error("Une erreur s'est produite");
 
-      setOpen(false);
-      window.location.reload();
+        setOpen(false);
+      }
+    } catch (error) {
+      console.log();
+
+      toast.error("Une erreur s'est produite", error);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const onSubmit = async (values) => {
-    if (isUpdate) await handleUpdate(values);
-    else await handleCreation(values);
   };
 
   return (
@@ -87,7 +82,7 @@ export default function DelivererForm({ children, data, open, setOpen }) {
       {!data && <SheetTrigger asChild>{children}</SheetTrigger>}
       <SheetContent className="w-full" side="right">
         <SheetHeader>
-          <SheetTitle>{data ? "Modifier" : "Ajouter"} un client</SheetTitle>
+          <SheetTitle>{data ? "Modifier" : "Ajouter"} un livreur</SheetTitle>
         </SheetHeader>
         <div className="space-y-4 p-3">
           <Form {...form}>
@@ -95,7 +90,7 @@ export default function DelivererForm({ children, data, open, setOpen }) {
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-col gap-4"
             >
-              {/* Prénom / Nom */}
+              {/* Prénom */}
               <FormField
                 control={form.control}
                 name="firstName"
@@ -109,6 +104,8 @@ export default function DelivererForm({ children, data, open, setOpen }) {
                   </FormItem>
                 )}
               />
+
+              {/* Nom */}
               <FormField
                 control={form.control}
                 name="lastName"
@@ -131,7 +128,7 @@ export default function DelivererForm({ children, data, open, setOpen }) {
                   <FormItem>
                     <FormLabel>Adresse *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Adresse" {...field} />
+                      <Input placeholder="Adresse complète" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -144,7 +141,7 @@ export default function DelivererForm({ children, data, open, setOpen }) {
                 name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Téléphone *</FormLabel>
+                    <FormLabel>Numéro de téléphone *</FormLabel>
                     <FormControl>
                       <Input placeholder="0X XX XX XX XX" {...field} />
                     </FormControl>
@@ -168,50 +165,35 @@ export default function DelivererForm({ children, data, open, setOpen }) {
                 )}
               />
 
-              {/* Mot de passe */}
+              {/* Numéro de carte d'identité */}
               <FormField
                 control={form.control}
-                name="password"
+                name="nationalID"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mot de passe *</FormLabel>
+                    <FormLabel>Numéro de carte d'identité *</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="******" {...field} />
+                      <Input placeholder="Numéro de CIN" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* N° Identité / Véhicule */}
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="nationalID"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>N° Carte ident. *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="XXXXXXXX" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="vehiculeID"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Matricule véhicule *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="1234-AB-56" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {/* Matricule du véhicule */}
+              <FormField
+                control={form.control}
+                name="vehiculeID"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Matricule du véhicule *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="1234-AB-56" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Photo de profil */}
               <FormField
@@ -219,12 +201,11 @@ export default function DelivererForm({ children, data, open, setOpen }) {
                 name="profilePicture"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Photo de profil *</FormLabel>
+                    <FormLabel>Photo de profil</FormLabel>
                     <FormControl>
                       <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => field.onChange(e.target.files?.[0])}
+                        placeholder=" Photo de profil (optionnel)"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -232,47 +213,32 @@ export default function DelivererForm({ children, data, open, setOpen }) {
                 )}
               />
 
-              {/* Code de parrainage / Points */}
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="referralCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Code parrainage</FormLabel>
-                      <FormControl>
-                        <Input placeholder="ABC123" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="referredPoints"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Points gagnés</FormLabel>
-                      <FormControl>
-                        <Input type="number" min={0} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {/* Code de parrainage */}
+              <FormField
+                control={form.control}
+                name="referralCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Code de parrainage</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Code de parrainage (optionnel)"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Bouton de soumission */}
               <Button
-                type="submit"
+                type="button"
+                onClick={form.handleSubmit(onSubmit)}
                 size="lg"
-                disabled={form.formState.isSubmitting}
+                className="mt-4"
               >
-                {form.formState.isSubmitting
-                  ? "Envoi..."
-                  : isUpdate
-                    ? "Modifier"
-                    : "Ajouter"}
+                Modifier le livreur
               </Button>
             </form>
           </Form>
