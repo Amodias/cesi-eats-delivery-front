@@ -1,18 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import DelivererProvider, { useDeliverer } from "../context/deliverer-provider";
 
 const DeliveryWelcome = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [isOnline, setIsOnline] = useState(false);
+  const [currentTime] = useState(new Date());
   const deliverer = useDeliverer();
-
-  const toggleOnlineStatus = () => {
-    setIsOnline(!isOnline);
-  };
 
   return (
     <div className="mx-auto space-y-6">
